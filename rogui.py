@@ -19,7 +19,7 @@ class CardMaker:
         #gui setup
         self.master = master
         master.title("Card Maker")
-        master.geometry("600x500")
+        master.geometry("800x700")
         master.resizable(True, True)
 
         #data
@@ -55,7 +55,7 @@ class CardMaker:
         self.path_label.grid(row=1, column=0)
         self.path_entry = tkinter.Entry(master)
         self.path_entry.grid(row=1, column=1)
-        self.path_button = tkinter.Button(master, text="Browse", command=self.browse)
+        self.path_button = tkinter.Button(master, text="Browse", command=self.browse_image)
         self.path_button.grid(row=1, column=2)
 
         #widget for previewing card image, leave it blank for now
@@ -159,13 +159,20 @@ class CardMaker:
 
     def remove_localization(self):
         if len(self.localizations) > 0:
-            self.localizations[-1][0].destroy()
-            self.localizations[-1][1].destroy()
+            #remove the last localization
+            #remove name
+            self.localizations[-1][1].grid_forget()
+            #remove description
+            self.localizations[-1][2].grid_forget()
+
+            #remove the localization from the list
             self.localizations.pop()
-    
     def save(self):
         #get card name
         name = self.name_entry.get()
+
+        #get card image path
+        path_entry = self.path_entry.get()
 
         #get card rarity
         rarity = self.rarity_var.get()
@@ -201,6 +208,7 @@ class CardMaker:
         #save card
         card = Card()
         card.name = name
+        card.path = path_entry
         card.rarity = rarity
         card.tags = tags
         card.dropweight = weight
@@ -219,6 +227,10 @@ class CardMaker:
         #get card name
         self.name_entry.delete(0, tkinter.END)
         self.name_entry.insert(0, self.card.name)
+
+        #get card image path
+        self.path_entry.delete(0, tkinter.END)
+        self.path_entry.insert(0, self.card.path)
 
         #get card rarity
         self.rarity_var.set(self.card.rarity)
@@ -255,30 +267,34 @@ class CardMaker:
         #get card localizations
         #language, name
         for i in range(len(self.localizations)):
-            self.remove_localization()
-        for i in range(len(self.card.namelocalization)):
-            self.create_localization()
-            self.localizations[-1][0].set(list(self.card.namelocalization.keys())[i])
-            self.localizations[-1][2].delete(0, tkinter.END)
-            self.localizations[-1][2].insert(0, list(self.card.namelocalization.values())[i])
+            try:
+                self.remove_localization()
+            except:
+                pass
+        if len(self.card.namelocalization) > 0:
+            for i in range(len(self.card.namelocalization)):
+                self.create_localization()
+                self.localizations[-1][0].set(list(self.card.namelocalization.keys())[i])
+                self.localizations[-1][2].delete(0, tkinter.END)
+                self.localizations[-1][2].insert(0, list(self.card.namelocalization.values())[i])
 
-    def browse(self):
+
+    def browse_image(self):
         #open file dialog and get image
-        filename = filedialog.askopenfilename(initialdir = "./",title = "Select file",filetypes = (("png files","*.png"),("all files","*.*")))
+        filename = filedialog.askopenfilename(initialdir = "./assets/",title = "Select file",filetypes = (("png files","*.png"),("all files","*.*")))
         if filename != "":
             self.image = Image.open(filename)
             self.image = self.image.resize((256, 256), Image.ANTIALIAS)
             self.image = ImageTk.PhotoImage(self.image)
             self.image_label.configure(image=self.image)
-            #convert image location to relative
-            self.image_location = filename.replace(os.getcwd(), "")
-            self.image_location = self.image_location.replace("\\", "/")
-            self.image_location = self.image_location[1:]
+            #convert path to relative path
+            self.image_path = filename[filename.find("assets"):]
+            #remove "assets/" from the path
+            self.image_path = self.image_path[7:]
+            print(self.image_path)
             #fill in the image path
             self.path_entry.delete(0, tkinter.END)
-            self.path_entry.insert(0, self.image_location)
-
-
+            self.path_entry.insert(0, self.image_path)
 
 class Card:
     def __init__(self):
@@ -324,6 +340,7 @@ def load_card(filename): #loads a SINGLE card from a json file
     return card
 
 def save_card(card, output_file=""): #Saves a SINGLE card into a json file
+    save_path = "data/"
     if output_file == "":
         output_file = card.name + ".json"
 
@@ -345,7 +362,7 @@ def save_card(card, output_file=""): #Saves a SINGLE card into a json file
     })
     # print(card.namelocalization)
 
-    with open(output_file, 'w') as outfile:
+    with open(save_path + output_file, 'w') as outfile:
         json.dump(data, outfile, indent=4)
     
 
