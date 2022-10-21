@@ -1,0 +1,43 @@
+{
+    "Stats": [
+        {
+            "Name": "triumph",
+            "TexturePath": "test/Adreneline.png",
+            "Rarity": "Epic",
+            "Tags": [],
+            "DropWeight": 0.0,
+            "LevelUpWeight": 0.0,
+            "MaxLevel": 5,
+            "Modifiers": [
+                {
+                    "ModifierValue": 20.0,
+                    "ModifierType": "Additional",
+                    "Stat": "MaxHealth"
+                },
+                {
+                    "ModifierValue": 1.0,
+                    "ModifierType": "Additional",
+                    "Stat": "Defence"
+                },
+                {
+                    "ModifierValue": 1.0,
+                    "ModifierType": "Additional",
+                    "Stat": "Damage"
+                },
+                {
+                    "ModifierValue": 1.25,
+                    "ModifierType": "Multiplier",
+                    "Stat": "XPMultiplier"
+                },
+                {
+                    "ModifierValue": 2.0,
+                    "ModifierType": "Compound",
+                    "Stat": "GoldMultiplier"
+                }
+            ],
+            "NameLocalization": {
+                "en": ""
+            }
+        }
+    ]
+}
